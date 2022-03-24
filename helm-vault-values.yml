@@ -1,0 +1,36 @@
+global:
+  enabled: true
+  tlsDisable: true
+
+injector:
+  enabled: true
+  image:
+    repository: "hashicorp/vault-k8s"
+    tag: "latest"
+  affinity: ""
+
+server:
+  affinity: ""
+  replicas: 3
+  ha:
+    enabled: true
+    config: |
+        disable_mlock = true
+        ui = true
+
+        listener "tcp" {
+          tls_disable = 1
+          address = "[::]:8200"
+          cluster_address = "[::]:8201"
+        }
+        storage "consul" {
+          path = "vault"
+          address = "HOST_IP:8500"
+        }
+        seal "awskms" {
+          region = "REGION-AWS-KMS-?"
+          access_key = "YOUR-ACCESS-KEY-?"
+          secret_key = "YOUR-SECRET-KEY-?"
+          kms_key_id = "YOUR-KMS-KEY-ID-?"
+        }
+        service_registration "kubernetes" {}
